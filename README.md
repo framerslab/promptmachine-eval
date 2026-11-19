@@ -115,7 +115,7 @@ tester = PromptTester(openai_api_key="sk-...")
 
 results = asyncio.run(tester.test(
     prompt="Explain recursion to a beginner",
-    models=["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"]
+    models=["gpt-4o", "gpt-4o-mini", "gpt-6-luna"]
 ))
 
 for r in results:
@@ -178,7 +178,7 @@ export OPENROUTER_API_KEY=sk-or-...
 
 | Provider | Models |
 |----------|--------|
-| **OpenAI** | gpt-4o, gpt-4o-mini, gpt-4-turbo, gpt-3.5-turbo, o1-preview, o1-mini |
+| **OpenAI** | gpt-6.2-astra, gpt-6.2-sol, gpt-6-luna, gpt-4o, gpt-4o-mini |
 | **Anthropic** | claude-3-5-sonnet, claude-3-5-haiku, claude-3-opus |
 | **OpenRouter** | gemini-pro-1.5, llama-3.1-70b, mistral-large, deepseek-coder, qwen-max, + more |
 

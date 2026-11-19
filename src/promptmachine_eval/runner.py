@@ -22,6 +22,46 @@ import time
 
 from promptmachine_eval.cost import CostTracker
 
+# OpenAI ids that answer 404 today, each with the cheapest served model that does its job.
+RETIRED_OPENAI_MODELS: dict[str, str] = {
+    "gpt-3.5-turbo": "gpt-6-luna",
+    "gpt-4": "gpt-6.2-sol",
+    "gpt-4-turbo": "gpt-6.2-sol",
+    "gpt-4-turbo-preview": "gpt-6.2-sol",
+    "gpt-4.1-nano": "gpt-6-luna",
+    "chatgpt-4o-latest": "gpt-6.2-sol",
+    "o1": "gpt-6.2-sol",
+    "o1-mini": "gpt-6-luna",
+    "o1-preview": "gpt-6.2-sol",
+    "o3-mini": "gpt-6.2-sol",
+    "o4-mini": "gpt-6.2-sol",
+}
+
+
+def openai_chat_params(model: str, temperature: float, max_tokens: int) -> dict[str, Any]:
+    """Return the Chat Completions fields this OpenAI model accepts.
+
+    GPT-6 and the reasoning models refuse ``max_tokens`` and take ``max_completion_tokens``.
+    GPT-6.2 refuses ``temperature``; GPT-6 Luna takes it only at reasoning effort ``none``,
+    which also bills no reasoning tokens.
+
+    Raises:
+        ValueError: The model is shut down; the message names its replacement.
+    """
+    name = model.lower()
+    replacement = RETIRED_OPENAI_MODELS.get(name)
+    if replacement:
+        raise ValueError(f"OpenAI has shut down {model}; use {replacement} instead")
+    if name.startswith("gpt-6-luna"):
+        return {
+            "max_completion_tokens": max_tokens,
+            "reasoning_effort": "none",
+            "temperature": temperature,
+        }
+    if name.startswith(("gpt-5", "gpt-6", "o1", "o3", "o4")):
+        return {"max_completion_tokens": max_tokens}
+    return {"temperature": temperature, "max_tokens": max_tokens}
+
 
 @dataclass
 class TestResult:
@@ -162,11 +202,18 @@ class PromptTester:
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
         
+        params = openai_chat_params(model, temperature, max_tokens)
+        # The openai SDK versions pyproject allows (>=1.3.0) predate these two
+        # keyword arguments, so they travel in the request body, which every 1.x
+        # client sends as given.
+        body = {k: params.pop(k) for k in ("max_completion_tokens", "reasoning_effort") if k in params}
+        if body:
+            params["extra_body"] = body
+
         response = await client.chat.completions.create(
             model=model,
             messages=messages,
-            temperature=temperature,
-            max_tokens=max_tokens,
+            **params,
         )
         
         content = response.choices[0].message.content or ""

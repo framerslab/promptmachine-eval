@@ -151,7 +151,7 @@ async def demo_prompt_testing():
     print("\n🧪 Testing prompt across models...")
     results = await tester.test(
         prompt="What is 2 + 2? Reply with just the number.",
-        models=["gpt-4o-mini", "gpt-3.5-turbo"],
+        models=["gpt-4o-mini", "gpt-6-luna"],
         temperature=0.0,
         max_tokens=10,
     )
@@ -177,11 +177,11 @@ async def demo_arena_battle():
 
     runner = BattleRunner(openai_api_key=openai_key)
 
-    print("\n⚔️  Running battle: gpt-4o-mini vs gpt-3.5-turbo")
+    print("\n⚔️  Running battle: gpt-4o-mini vs gpt-6-luna")
     result = await runner.battle(
         prompt="Write a one-sentence definition of recursion.",
         model_a="gpt-4o-mini",
-        model_b="gpt-3.5-turbo",
+        model_b="gpt-6-luna",
         judge_model="gpt-4o-mini",
     )
 

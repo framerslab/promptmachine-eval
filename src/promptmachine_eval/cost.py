@@ -20,12 +20,10 @@ MODEL_PRICING: dict[str, dict[str, float]] = {
     # OpenAI
     "gpt-4o": {"input": 0.0025, "output": 0.01},
     "gpt-4o-mini": {"input": 0.00015, "output": 0.0006},
-    "gpt-4-turbo": {"input": 0.01, "output": 0.03},
-    "gpt-4-turbo-preview": {"input": 0.01, "output": 0.03},
-    "gpt-4": {"input": 0.03, "output": 0.06},
-    "gpt-3.5-turbo": {"input": 0.0005, "output": 0.0015},
-    "o1-preview": {"input": 0.015, "output": 0.06},
-    "o1-mini": {"input": 0.003, "output": 0.012},
+    # GPT-6 rows from OpenAI's pricing page, read 2026-11-17
+    "gpt-6.2-astra": {"input": 0.008, "output": 0.04},
+    "gpt-6.2-sol": {"input": 0.002, "output": 0.01},
+    "gpt-6-luna": {"input": 0.0001, "output": 0.0005},
     
     # Anthropic
     "claude-3-5-sonnet-latest": {"input": 0.003, "output": 0.015},
