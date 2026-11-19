@@ -202,10 +202,18 @@ class PromptTester:
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
         
+        params = openai_chat_params(model, temperature, max_tokens)
+        # The openai SDK versions pyproject allows (>=1.3.0) predate these two
+        # keyword arguments, so they travel in the request body, which every 1.x
+        # client sends as given.
+        body = {k: params.pop(k) for k in ("max_completion_tokens", "reasoning_effort") if k in params}
+        if body:
+            params["extra_body"] = body
+
         response = await client.chat.completions.create(
             model=model,
             messages=messages,
-            **openai_chat_params(model, temperature, max_tokens),
+            **params,
         )
         
         content = response.choices[0].message.content or ""
